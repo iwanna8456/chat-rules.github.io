@@ -1,58 +1,135 @@
-<!DOCTYPE html>
-<html lang="en-US">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>📜 Telegram Rules - Раздел с правилами | GamzeeChert</title>
-    <!-- Прямое подключение оригинального файла стилей -->
-    <link rel="stylesheet" href="https://gamzeechert.github.io/assets/css/style.css?v=6542331b7502a6fa318a2990c0b61244b72195e0">
-</head>
-<body>
-    <header>
-      <div class="container">
-        <a id="a-title" href="/">
-          <h1>GamzeeChert</h1>
-        </a>
-        <h2>📜 Telegram Rules | 🎮 Game Rules | 📚 Game Guide | 🛍️ Madness Games Store | 🤖 Bot Info | 💎 Fragment</h2>
-      </div>
-    </header>
+body {
+    background-color: #202124;
+    color: #e8eaed;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+}
 
-    <div class="container">
-      <section id="main_content">
-        <h1 id="-правила-для-чатов-telegram">📃 Правила для чатов Telegram</h1>
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
 
-        <p><a href="./index.html" class="button-link">🌐 Главная страница</a>
-        <a href="./links.html" class="button-link">🔗 Раздел ссылок</a></p>
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #5f6368;
+}
 
-        <hr>
+header h1 {
+    font-size: 2.8em;
+    margin: 10px 0;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
 
-        <h3 id="--временные-правила">⏳ • Временные правила:</h3>
-        <p>Запрещены <strong>политические дискуссии, агитация и провокационные темы</strong>, не относящиеся к проекту;</p>
-        <!-- За использование **нецензурной лексики** в чатах, а также **попытку обхода фильтра запрещённых слов** будет выдаваться **предупреждение**. -->
-        <p>За <strong>чрезмерное использование нецензурной лексики</strong> будет выдаваться <strong>предупреждение</strong>.</p>
+header h2 {
+    font-size: 1.2em;
+    color: #9aa0a6;
+    font-weight: 400;
+    margin: 10px 0;
+}
 
-        <h3 id="--запрещено">🚫 • Запрещено:</h3>
-        <ol>
-          <li>Спам;</li>
-          <li><a href="www">ASCII графика</a>;</li>
-          <li><a href="wwwww,wwwwwwww">Флуд</a>;</li>
-          <li>Отправка <strong>материалов</strong> с тегом 18+ (Шок-контент);</li>
-          <li>Отправка <strong>стикеров</strong> с тегом 18+;</li>
-          <li>Отправка сообщений/материалов <strong>от имени канала</strong> (Разрез…</li>
-        </ol>
+#main_content {
+    background-color: #292a2d;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    border: 1px solid #3c4043;
+}
 
-        <!-- ОСТАВШАЯСЯ ЧАСТЬ КОНТЕНТА (полный список правил) -->
-        <!-- В целях экономии места здесь приведена неполная структура. -->
-        <!-- В реальном файле сюда нужно вставить ВЕСЬ оставшийся текст правил, как на исходной странице, включая разделы "⚠️ • Не рекомендуется:", "ℹ️ • Прочая информация:" и подвал. -->
+#main_content h1 {
+    color: #ffffff;
+    font-size: 2em;
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #5f6368;
+}
 
-        <hr>
+#main_content h3 {
+    color: #8ab4f8;
+    margin-top: 25px;
+    font-size: 1.3em;
+}
 
-        <p><a href="./TGmodRules.html" class="button2-link">📝 Раздел для модераторов и стажёров</a></p>
+.button-link, .button2-link {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 5px 10px 5px 0;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+}
 
-        <p><code class="language-plaintext highlighter-rouge">Правила обновлены 30.11.2025</code></p>
+.button-link {
+    background-color: #3c4043;
+    color: #e8eaed;
+    border: 1px solid #5f6368;
+}
 
-      </section>
-    </div>
-</body>
-</html>
+.button2-link {
+    background-color: #5c6bc0;
+    color: white;
+    border: 1px solid #7986cb;
+}
+
+.button-link:hover {
+    background-color: #5f6368;
+}
+
+.button2-link:hover {
+    background-color: #7986cb;
+}
+
+hr {
+    border: none;
+    height: 1px;
+    background-color: #5f6368;
+    margin: 25px 0;
+}
+
+ol, ul {
+    padding-left: 25px;
+}
+
+li {
+    margin-bottom: 8px;
+    color: #e8eaed;
+}
+
+blockquote {
+    border-left: 4px solid #5c6bc0;
+    padding-left: 15px;
+    margin-left: 0;
+    color: #bdc1c6;
+    background-color: rgba(92,107,192,0.1);
+    padding: 10px;
+    border-radius: 0 5px 5px 0;
+}
+
+code {
+    background-color: #3c4043;
+    color: #f48fb1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+}
+
+strong {
+    color: #ffffff;
+}
+
+a {
+    color: #8ab4f8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
