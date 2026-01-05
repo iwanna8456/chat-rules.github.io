@@ -37,10 +37,10 @@
             min-height: 100vh;
         }
 
-        /* Светящийся серый заголовок БЕЗ фона */
+        /* Светящийся заголовок БЕЗ фона */
         header .container {
-            padding: 20px 0;
-            margin: 20px auto 30px auto;
+            padding: 15px 0;
+            margin: 10px auto 25px auto;
             max-width: 900px;
             text-align: center;
             background: transparent !important;
@@ -49,28 +49,24 @@
             backdrop-filter: none !important;
         }
 
-        /* Заголовки в хидере */
+        /* Заголовки в хидере - убрали GamzeeChert */
         header h1 {
-            margin-bottom: 5px;
-            font-size: 2.2em;
-            color: #f0f0f0;
-            font-weight: 700;
-            text-shadow: 0 0 15px rgba(150, 150, 150, 0.7); /* Серое свечение */
+            display: none; /* Скрываем GamzeeChert */
         }
         header h2 {
-            font-size: 1em;
-            color: rgba(220, 220, 220, 0.9);
-            margin-top: 5px;
+            font-size: 1.1em;
+            color: rgba(220, 220, 220, 0.95);
+            margin: 0 0 15px 0;
             font-weight: 400;
             letter-spacing: 0.3px;
-            text-shadow: 0 0 10px rgba(180, 180, 180, 0.5); /* Серое свечение */
+            text-shadow: 0 0 12px rgba(180, 180, 180, 0.6); /* Серое свечение */
         }
 
-        /* Кнопки в стиле iOS */
+        /* Кнопки в стиле iOS с увеличенным скруглением на 25% */
         .ios-button-container {
             display: flex;
-            gap: 12px;
-            margin: 25px 0;
+            gap: 15px;
+            margin: 20px 0 30px 0;
             flex-wrap: wrap;
             justify-content: center;
         }
@@ -78,30 +74,30 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background-color: rgba(120, 120, 120, 0.7);
+            background-color: rgba(120, 120, 120, 0.75);
             backdrop-filter: blur(20px);
             color: #fff;
-            padding: 14px 26px;
-            border-radius: 12px;
+            padding: 16px 28px;
+            border-radius: 20px; /* Увеличили на 25% (было 16px) */
             text-decoration: none;
             font-weight: 500;
             font-size: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.18);
             box-shadow: 
-                0 4px 12px rgba(0, 0, 0, 0.15),
-                0 0 1px rgba(255, 255, 255, 0.1);
+                0 5px 15px rgba(0, 0, 0, 0.2),
+                0 0 2px rgba(255, 255, 255, 0.15);
             transition: all 0.25s ease;
             flex: 1;
-            min-width: 160px;
-            max-width: 250px;
+            min-width: 170px;
+            max-width: 260px;
         }
         /* Эффект наведения для iOS кнопок */
         a.button-link:hover {
-            background-color: rgba(140, 140, 140, 0.8);
-            transform: translateY(-2px);
+            background-color: rgba(140, 140, 140, 0.85);
+            transform: translateY(-3px);
             box-shadow: 
-                0 6px 16px rgba(0, 0, 0, 0.2),
-                0 0 8px rgba(200, 200, 200, 0.6); /* Серое свечение */
+                0 8px 20px rgba(0, 0, 0, 0.25),
+                0 0 12px rgba(200, 200, 200, 0.7); /* Серое свечение */
         }
 
         /* Контейнер с правилами БЕЗ фона */
@@ -136,13 +132,13 @@
             color: #c9a8ff;
             text-decoration: none;
             transition: text-shadow 0.3s ease;
-            background: none !important; /* Убираем фон при наведении */
+            background: none !important;
             padding: 0 !important;
             border-radius: 0 !important;
         }
         #main_content a:hover {
             color: #ffffff;
-            text-shadow: 0 0 12px #bf80ff; /* Только свечение текста */
+            text-shadow: 0 0 15px #bf80ff;
             background: transparent !important;
         }
 
@@ -163,7 +159,7 @@
             color: #b0b0b0;
             background-color: rgba(40, 40, 40, 0.3);
             padding: 12px;
-            border-radius: 0 8px 8px 0;
+            border-radius: 0 10px 10px 0;
         }
 
         /* Разделительные линии */
@@ -179,7 +175,7 @@
             background-color: rgba(50, 50, 50, 0.5);
             color: #b19cd9;
             padding: 5px 10px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 0.9em;
             border: 1px solid rgba(100, 100, 100, 0.3);
         }
@@ -189,31 +185,29 @@
             display: inline-block;
             background-color: rgba(100, 40, 150, 0.6);
             color: #e6d5ff;
-            padding: 12px 24px;
+            padding: 14px 28px;
             margin: 20px 0;
-            border-radius: 8px;
+            border-radius: 14px; /* Увеличили скругление */
             text-decoration: none;
             font-weight: 500;
             border: 1px solid #5a2d8a;
-            box-shadow: 0 0 10px rgba(150, 80, 220, 0.3);
+            box-shadow: 0 0 12px rgba(150, 80, 220, 0.3);
             transition: all 0.3s ease;
         }
         .button2-link:hover {
-            box-shadow: 0 0 18px rgba(191, 128, 255, 0.7);
+            box-shadow: 0 0 20px rgba(191, 128, 255, 0.8);
             background-color: rgba(120, 60, 180, 0.8);
-            transform: translateY(-1px);
+            transform: translateY(-2px);
         }
     </style>
 </head>
 <body>
     <header>
         <div class="container">
-            <a id="a-title" href="/" style="text-decoration: none;">
-                <h1>GamzeeChert</h1>
-            </a>
+            <!-- Заголовок GamzeeChert удалён -->
             <h2>📜 Telegram Rules | 🎮 Game Rules | 📚 Game Guide | 🛍️ Madness Games Store | 🤖 Bot Info | 💎 Fragment</h2>
             
-            <!-- Кнопки в стиле iOS -->
+            <!-- Кнопки в стиле iOS с увеличенным скруглением -->
             <div class="ios-button-container">
                 <a href="./index.html" class="button-link">🌐 Главная страница</a>
                 <a href="./links.html" class="button-link">🔗 Раздел ссылок</a>
