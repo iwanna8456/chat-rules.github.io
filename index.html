@@ -37,18 +37,16 @@
             min-height: 100vh;
         }
 
-        /* Полупрозрачный серый заголовок с очень слабым светом */
+        /* Светящийся серый заголовок БЕЗ фона */
         header .container {
-            background-color: rgba(50, 50, 50, 0.65); /* Полупрозрачный серый */
-            backdrop-filter: blur(10px); /* Размытие фона как в iOS */
-            border-radius: 14px; /* Скругление как в iOS */
-            padding: 20px 25px;
+            padding: 20px 0;
             margin: 20px auto 30px auto;
             max-width: 900px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 
-                0 0 2px rgba(180, 70, 255, 0.05), /* Очень слабый свет */
-                0 4px 20px rgba(0, 0, 0, 0.25); /* Тень для объёма */
+            text-align: center;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
         }
 
         /* Заголовки в хидере */
@@ -57,14 +55,15 @@
             font-size: 2.2em;
             color: #f0f0f0;
             font-weight: 700;
-            text-shadow: 0 0 3px rgba(180, 70, 255, 0.1);
+            text-shadow: 0 0 15px rgba(150, 150, 150, 0.7); /* Серое свечение */
         }
         header h2 {
             font-size: 1em;
-            color: rgba(220, 220, 220, 0.8);
+            color: rgba(220, 220, 220, 0.9);
             margin-top: 5px;
             font-weight: 400;
             letter-spacing: 0.3px;
+            text-shadow: 0 0 10px rgba(180, 180, 180, 0.5); /* Серое свечение */
         }
 
         /* Кнопки в стиле iOS */
@@ -73,16 +72,17 @@
             gap: 12px;
             margin: 25px 0;
             flex-wrap: wrap;
+            justify-content: center;
         }
         a.button-link {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background-color: rgba(120, 120, 120, 0.7); /* Серый фон */
+            background-color: rgba(120, 120, 120, 0.7);
             backdrop-filter: blur(20px);
             color: #fff;
             padding: 14px 26px;
-            border-radius: 12px; /* Скругление iOS */
+            border-radius: 12px;
             text-decoration: none;
             font-weight: 500;
             font-size: 16px;
@@ -101,8 +101,7 @@
             transform: translateY(-2px);
             box-shadow: 
                 0 6px 16px rgba(0, 0, 0, 0.2),
-                0 0 8px rgba(180, 70, 255, 0.4);
-            color: #ffffff;
+                0 0 8px rgba(200, 200, 200, 0.6); /* Серое свечение */
         }
 
         /* Контейнер с правилами БЕЗ фона */
@@ -110,7 +109,7 @@
             max-width: 900px;
             margin: 0 auto;
             padding: 0;
-            background: transparent; /* Убрали фон */
+            background: transparent;
             box-shadow: none;
             border: none;
         }
@@ -132,15 +131,19 @@
             border-bottom: 1px solid rgba(100, 100, 100, 0.4);
         }
 
-        /* Ссылки в тексте правил */
+        /* Ссылки в тексте правил - ТОЛЬКО свечение текста */
         #main_content a {
             color: #c9a8ff;
             text-decoration: none;
-            transition: color 0.3s, text-shadow 0.3s;
+            transition: text-shadow 0.3s ease;
+            background: none !important; /* Убираем фон при наведении */
+            padding: 0 !important;
+            border-radius: 0 !important;
         }
         #main_content a:hover {
             color: #ffffff;
-            text-shadow: 0 0 10px #bf80ff;
+            text-shadow: 0 0 12px #bf80ff; /* Только свечение текста */
+            background: transparent !important;
         }
 
         /* Списки */
@@ -198,6 +201,7 @@
         .button2-link:hover {
             box-shadow: 0 0 18px rgba(191, 128, 255, 0.7);
             background-color: rgba(120, 60, 180, 0.8);
+            transform: translateY(-1px);
         }
     </style>
 </head>
