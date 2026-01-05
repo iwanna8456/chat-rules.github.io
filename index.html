@@ -1,237 +1,137 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>VOID ECHO: Full Edition 2025</title>
-    <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Courier New', monospace; }
-        canvas { display: block; image-rendering: pixelated; }
-        #device-menu, #menu { position: absolute; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; color: white; text-align: center; border: 4px solid white; box-sizing: border-box; }
-        #menu-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
-        .btn { padding: 15px 40px; font-size: 24px; background: black; color: white; border: 4px solid white; cursor: pointer; margin: 10px; position: relative; z-index: 101; font-family: inherit; }
-        .btn:hover { background: white; color: black; }
-        #seed-input { padding: 10px; font-size: 18px; margin-top: 20px; background: #111; color: white; border: 2px solid white; text-align: center; width: 250px; outline: none; }
-        #hud { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: none; flex-direction: column; align-items: center; pointer-events: none; }
-        #hearts { display: flex; margin-bottom: 10px; font-size: 28px; line-height: 28px; }
-        .heart { color: #ff0000; margin: 0 3px; text-shadow: 0 0 5px rgba(255,0,0,0.5); }
-        .heart.empty { color: #330000; text-shadow: none; }
-        .heart.god { text-shadow: 0 0 10px #fff; }
-        #hotbar { display: flex; background: rgba(0,0,0,0.8); border: 2px solid #fff; padding: 5px; pointer-events: auto; }
-        .slot { width: 48px; height: 48px; border: 2px solid #444; margin: 0 4px; display: flex; align-items: center; justify-content: center; font-size: 24px; opacity: 0.3; }
-        .slot.active { border-color: #fff; box-shadow: 0 0 15px #fff; opacity: 1 !important; }
-        .slot.unlocked { opacity: 1; border-color: #666; }
-        #status-ui { position: absolute; top: 10px; left: 10px; color: #0f0; font-weight: bold; font-size: 14px; text-shadow: 1px 1px #000; z-index: 10; }
-        #seed-container { position: absolute; bottom: 10px; left: 10px; display: none; z-index: 10; font-size: 12px; color: rgba(255,255,255,0.5); }
-        #seed-display-val { background: transparent; border: none; color: rgba(255,255,255,0.5); font-family: inherit; width: 150px; outline: none; }
-        #side-panel { position: absolute; top: 10px; right: -210px; width: 250px; background: rgba(0, 0, 0, 0.8); border: 2px solid #fff; padding: 10px; transition: right 0.4s; z-index: 150; display: none; color: white; }
-        #side-panel:hover { right: 10px; }
-        #side-input { width: 100%; background: #111; color: #fff; border: 1px solid #fff; padding: 5px; box-sizing: border-box; font-family: inherit; }
-        #mobile-controls { position: absolute; bottom: 30px; width: 100%; display: none; justify-content: space-between; padding: 0 40px; box-sizing: border-box; z-index: 200; pointer-events: none; }
-        .joy-btn { width: 85px; height: 85px; background: rgba(255,255,255,0.1); border: 3px solid white; border-radius: 50%; pointer-events: auto; display: flex; align-items: center; justify-content: center; color: white; font-size: 32px; -webkit-user-select: none; }
-    </style>
-</head>
-<body>
-    <div id="status-ui"></div>
-    <div id="seed-container">SEED: <input type="text" id="seed-display-val" readonly></div>
-    <div id="side-panel"><h3>COMMAND INPUT</h3><input type="text" id="side-input" placeholder="Type here..."></div>
-    <div id="device-menu"><h1>SELECT DEVICE</h1><button class="btn" onclick="selectDevice('pc')">PC</button><button class="btn" onclick="selectDevice('mobile')">MOBILE</button></div>
-    <div id="menu" style="display:none"><canvas id="menu-canvas"></canvas><h1>VOID ECHO</h1><input type="text" id="seed-input" placeholder="Seed..." maxlength="15"><button id="start-btn" class="btn">START</button></div>
-    <div id="mobile-controls"><div style="display:flex; gap: 25px;"><div class="joy-btn" id="m-left">←</div><div class="joy-btn" id="m-right">→</div></div><div class="joy-btn" id="m-jump">▲</div></div>
-    <div id="hud"><div id="hearts"></div><div id="hotbar"><div class="slot active unlocked">🟫</div><div class="slot unlocked">🔥</div><div class="slot unlocked">💧</div><div class="slot"></div><div class="slot"></div><div class="slot unlocked" id="slot5" style="display:none">🌈</div></div></div>
-    <canvas id="game"></canvas>
+<html lang="en-US"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/assets/css/style.css?v=6542331b7502a6fa318a2990c0b61244b72195e0">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
 
-<script>
-const canvas = document.getElementById('game'), ctx = canvas.getContext('2d'), menuCanvas = document.getElementById('menu-canvas'), mCtx = menuCanvas.getContext('2d');
-const ITEMS = ['dirt', 'lava', 'water', null, null, 'rainbow'], LIQUIDS = ['water', 'lava', 'rainbow'], TILE = 32, GRAVITY = 0.4, JUMP = -8.5, SPEED = 3.5;
-let isGameStarted = false, rainbowHue = 0, cameraZoom = 1.0, isNoclip = false, isGodMode = false, isSoundMuted = false, isAdmin = false, currentSeed = "0", isMobile = false;
-let player = { x: 0, y: 0, vx: 0, vy: 0, w: 22, h: 36, grounded: false, inWater: false, walkTimer: 0, dir: 1, hurtTint: 0, hp: 10, maxHp: 10, lastHit: 0, selectedSlot: 0 };
-let world = {}, particles = [], clones = [], liquidUpdateFrame = 0;
-let monster = { x: 0, y: 0, active: false, timer: 0, nextSpawn: Date.now() + 300000 };
-const keys = {};
+<!-- Setup theme-color -->
+<!-- start theme color meta headers -->
+<meta name="theme-color" content="#151515">
+<meta name="msapplication-navbutton-color" content="#151515">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- end theme color meta headers -->
 
-function selectDevice(t) { isMobile = (t === 'mobile'); document.getElementById('device-menu').style.display = 'none'; document.getElementById('menu').style.display = 'flex'; if (isMobile) document.getElementById('mobile-controls').style.display = 'flex'; initMenu(); }
-function spawnParticles(x, y, color) { for(let i=0; i<10; i++) particles.push({ x: x+Math.random()*TILE, y: y+Math.random()*TILE, vx: (Math.random()-0.5)*4, vy: Math.random()*2, life: 300, color: color }); }
-function spawnClone() { clones.push({ x: player.x, y: player.y, vx: (Math.random()-0.5)*5, vy: JUMP, w: 22, h: 36, dir: Math.random()>0.5?1:-1, walkTimer: 0, grounded: false }); }
 
-function updateLiquids() {
-    let tiles = Object.keys(world);
-    for (let key of tiles) {
-        let b = world[key];
-        if (LIQUIDS.includes(b.type)) {
-            let [x, y] = key.split(',').map(Number);
-            if (y > 174) continue;
-            if (b.type === 'rainbow') {
-                [`${x},${y+1}`, `${x-1},${y}`, `${x+1},${y}`].forEach(n => { if(!world[n]) world[n]={type:'rainbow', dist:0}});
-                continue;
-            }
-            let down = `${x},${y+1}`;
-            if (!world[down]) { world[down] = { type: b.type, dist: 0 }; continue; }
-            let max = b.type === 'water' ? 7 : 3;
-            if (b.dist < max) {
-                if (!world[`${x-1},${y}`]) world[`${x-1},${y}`] = { type: b.type, dist: b.dist + 1 };
-                if (!world[`${x+1},${y}`]) world[`${x+1},${y}`] = { type: b.type, dist: b.dist + 1 };
-            }
-        }
-    }
-}
+<!-- Setup Google Analytics -->
 
-function cyrb128(str) {
-    let h1 = 1779033703, h2 = 1911520191, h3 = 2854904213, h4 = 3387418403;
-    for (let i = 0, k; i < str.length; i++) {
-        k = str.charCodeAt(i);
-        h1 = h2 ^ Math.imul(h1 ^ k, 597399067); h2 = h3 ^ Math.imul(h2 ^ k, 2869860233);
-    }
-    return [(h1^h2^h3^h4)>>>0, (h2^h1)>>>0];
-}
 
-function sfc32(a, b) { return function() { a >>>= 0; b >>>= 0; var t = (a + b | 0); a = b ^ b >>> 9; b = t; return (t >>> 0) / 4294967296; } }
 
-function generateRegion(startX, endX) {
-    const mods = JSON.parse(localStorage.getItem('void_echo_v1_' + currentSeed) || '{}');
-    const h = cyrb128(currentSeed), rand = sfc32(h, h);
-    for (let x = startX; x < endX; x++) {
-        let surf = 15 + Math.floor(Math.sin(x * 0.1) * 5 + Math.cos(x * 0.05) * 3);
-        for (let y = surf; y < 180; y++) {
-            let key = `${x},${y}`;
-            if (world[key]) continue;
-            if (mods[key]) { if (mods[key] === "deleted") continue; world[key] = { type: mods[key], modified: true }; continue; }
-            if (y === 175) { world[key] = {type: 'bedrock'}; continue; }
-            if (y < 95) world[key] = {type: (y === surf) ? 'grass' : (y > surf + 10 ? 'stone' : 'dirt')};
-            else if (y >= 135 && y > 140 + Math.sin(x * 0.2) * 5) world[key] = {type: rand() > 0.3 ? 'hellstone' : 'lava', dist: 0};
-        }
-    }
-}
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" -->
 
-function drawChar(x, y, dir, wt, tint, isFake = false) {
-    ctx.save(); ctx.translate(x + 11, y + 18);
-    if (!isFake && isAdmin) {
-        ctx.save(); ctx.scale(1/cameraZoom, 1/cameraZoom); ctx.font = "bold 14px 'Courier New'"; ctx.textAlign = "center";
-        ctx.shadowBlur = 10; ctx.shadowColor = "#0f0"; ctx.fillStyle = "#0f0"; ctx.fillText("[Admin]", 0, -36 * cameraZoom - 15); ctx.restore();
-        ctx.fillStyle = "#FF8C00"; ctx.beginPath(); ctx.moveTo(-6, -18); ctx.lineTo(-10, -30); ctx.lineTo(-2, -18); ctx.moveTo(6, -18); ctx.lineTo(10, -30); ctx.lineTo(2, -18); ctx.fill();
-    }
-    if (dir === -1) ctx.scale(-1, 1);
-    if (!isFake && isNoclip) ctx.globalAlpha = 0.75;
-    let pCol = tint > 0 ? "red" : (isFake ? "rgba(255,0,0,0.6)" : getDepthColor(y + 18));
-    ctx.strokeStyle = pCol; ctx.fillStyle = "black"; ctx.lineWidth = 2;
-    ctx.fillRect(-11, -18, 22, 28); ctx.strokeRect(-11, -18, 22, 28);
-    let lm = Math.sin(wt) * 6; ctx.strokeRect(-8, 10, 4, 8 + lm); ctx.strokeRect(4, 10, 4, 8 - lm);
-    ctx.fillStyle = pCol; ctx.fillRect(2, -8, 6, 2); ctx.fillRect(-6, -8, 6, 2); ctx.restore();
-}
+<!-- end custom head snippets -->
 
-function getDepthColor(y) {
-    let ty = y / TILE; if (ty > 180 || ty < 20) return "white";
-    if (ty <= 100) return `rgb(255, ${Math.floor(255*(1-(ty-20)/80))}, ${Math.floor(255*(1-(ty-20)/80))})`;
-    return ty <= 120 ? "red" : `rgb(${Math.floor(255*(1-(ty-120)/30))}, 0, 0)`;
-}
 
-function checkColl(obj, isX) {
-    if (obj === player && isNoclip) return;
-    let x1 = Math.floor(obj.x/TILE), x2 = Math.floor((obj.x+obj.w)/TILE), y1 = Math.floor(obj.y/TILE), y2 = Math.floor((obj.y+obj.h)/TILE);
-    for (let tx = x1; tx <= x2; tx++) for (let ty = y1; ty <= y2; ty++) {
-        let b = world[`${tx},${ty}`];
-        if (!b || LIQUIDS.includes(b.type)) {
-            if (b && obj === player) { 
-                player.inWater = true; 
-                if (b.type === 'lava' && !isGodMode && Date.now() - player.lastHit > 500) { player.hp--; player.hurtTint = 10; player.lastHit = Date.now(); updateUI(); }
-            }
-            continue;
-        }
-        if (isX) { if (obj.vx > 0) obj.x = tx * TILE - obj.w - 0.01; else if (obj.vx < 0) obj.x = (tx + 1) * TILE + 0.01; if (obj !== player) obj.dir *= -1; }
-        else { if (obj.vy > 0) { obj.y = ty * TILE - obj.h - 0.01; obj.vy = 0; obj.grounded = true; } else if (obj.vy < 0) { obj.y = (ty + 1) * TILE + 0.01; obj.vy = 0; } }
-    }
-}
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>📜 Telegram Rules - Раздел с правилами | GamzeeChert</title>
+<meta name="generator" content="Jekyll v3.10.0">
+<meta property="og:title" content="📜 Telegram Rules - Раздел с правилами">
+<meta property="og:locale" content="en_US">
+<meta name="description" content="📜 Telegram Rules 🎮 Game Rules 📚 Game Guide 🛍️ Madness Games Store 🤖 Bot Info 💎 Fragment">
+<meta property="og:description" content="📜 Telegram Rules 🎮 Game Rules 📚 Game Guide 🛍️ Madness Games Store 🤖 Bot Info 💎 Fragment">
+<link rel="canonical" href="https://gamzeechert.github.io/TGRules.html">
+<meta property="og:url" content="https://gamzeechert.github.io/TGRules.html">
+<meta property="og:site_name" content="GamzeeChert">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="📜 Telegram Rules - Раздел с правилами">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"📜 Telegram Rules 🎮 Game Rules 📚 Game Guide 🛍️ Madness Games Store 🤖 Bot Info 💎 Fragment","headline":"📜 Telegram Rules - Раздел с правилами","url":"https://gamzeechert.github.io/TGRules.html"}</script>
+<!-- End Jekyll SEO tag -->
 
-function gameLoop() {
-    if (!isGameStarted) return;
-    rainbowHue = (rainbowHue + 2) % 360;
-    if (isGodMode) updateUI();
-    
-    if (Date.now() > monster.nextSpawn && !monster.active) {
-        monster.active = true; monster.timer = Date.now() + 3000;
-        monster.x = player.x + (Math.random() > 0.5 ? 400 : -400); monster.y = player.y;
-        monster.nextSpawn = Date.now() + 300000;
-    }
-    if (monster.active && Date.now() > monster.timer) monster.active = false;
+  </head>
 
-    let mx = 0; if (keys['KeyA'] || (isMobile && keys['m-left'])) mx = -SPEED; if (keys['KeyD'] || (isMobile && keys['m-right'])) mx = SPEED;
-    if (isNoclip) {
-        player.vx = player.vy = 0; if (mx < 0) { player.x -= SPEED * 2; player.dir = -1; } if (mx > 0) { player.x += SPEED * 2; player.dir = 1; }
-        if (keys['Space'] || (isMobile && keys['m-jump'])) player.y -= SPEED * 2; if (keys['ShiftLeft']) player.y += SPEED * 2;
-    } else {
-        player.vx = mx; if (mx !== 0) { player.dir = mx > 0 ? 1 : -1; player.walkTimer += 0.15; }
-        player.x += player.vx; checkColl(player, true);
-        if (player.inWater) player.vy = (keys['Space'] || (isMobile && keys['m-jump'])) ? -4 : Math.min(player.vy + 0.1, 1.5);
-        else { player.vy += GRAVITY; if ((keys['Space'] || (isMobile && keys['m-jump'])) && player.grounded) { player.vy = JUMP; player.grounded = false; } }
-        player.y += player.vy; player.grounded = false; player.inWater = false; checkColl(player, false);
-    }
-    clones.forEach(c => { c.vx = c.dir * SPEED; c.x += c.vx; checkColl(c, true); c.vy += GRAVITY; if (c.grounded && Math.random() < 0.02) c.vy = JUMP; c.y += c.vy; c.grounded = false; checkColl(c, false); c.walkTimer += 0.15; });
-    if (++liquidUpdateFrame % 10 === 0) updateLiquids();
-    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-    ctx.fillStyle = player.y / TILE > 180 ? "white" : "black"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.save(); ctx.translate(canvas.width / 2, canvas.height / 2); ctx.scale(cameraZoom, cameraZoom); ctx.translate(-player.x, -player.y);
-    for (let i = particles.length - 1; i >= 0; i--) {
-        let p = particles[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.1; p.life--; ctx.globalAlpha = Math.max(0, p.life / 300);
-        ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, 4, 4); if (p.life <= 0) particles.splice(i, 1);
-    }
-    ctx.globalAlpha = 1;
-    let vw = (canvas.width / TILE) / cameraZoom / 2 + 2, vh = (canvas.height / TILE) / cameraZoom / 2 + 2;
-    for (let x = Math.floor(player.x / TILE - vw); x < Math.ceil(player.x / TILE + vw); x++) for (let y = Math.floor(player.y / TILE - vh); y < Math.ceil(player.y / TILE + vh); y++) {
-        let b = world[`${x},${y}`]; if (!b) continue;
-        if (b.type === 'lava') { ctx.fillStyle = "#FF8C00"; ctx.fillRect(x*TILE, y*TILE+4, TILE, TILE-4); }
-        else if (b.type === 'water') { ctx.fillStyle = "#0077FF"; ctx.fillRect(x*TILE, y*TILE+4, TILE, TILE-4); }
-        else if (b.type === 'rainbow') { ctx.fillStyle = `hsl(${rainbowHue}, 80%, 50%)`; ctx.fillRect(x*TILE, y*TILE, TILE, TILE); }
-        else { ctx.strokeStyle = getDepthColor(y * TILE); ctx.lineWidth = b.type === 'bedrock' ? 4 : 2; ctx.strokeRect(x * TILE + 2, y * TILE + 2, TILE - 4, TILE - 4); }
-    }
-    drawChar(player.x, player.y, player.dir, player.walkTimer, player.hurtTint);
-    if (monster.active) drawChar(monster.x, monster.y, monster.x > player.x ? -1 : 1, 0, 0, true);
-    clones.forEach(c => drawChar(c.x, c.y, c.dir, c.walkTimer, 0)); ctx.restore();
-    if (liquidUpdateFrame % 60 === 0) generateRegion(Math.floor(player.x/TILE)-40, Math.floor(player.x/TILE)+40);
-    if (player.hp <= 0 && !isGodMode) { player.x = 0; player.y = 0; player.hp = 10; updateUI(); }
-    requestAnimationFrame(gameLoop);
-}
+  <body>
 
-function updateUI() {
-    const h = document.getElementById('hearts'); h.innerHTML = '';
-    for(let i=0; i<10; i++) {
-        let empty = i >= player.hp; let style = isGodMode ? `color: hsl(${rainbowHue}, 80%, 50%)` : "";
-        h.innerHTML += `<span class="heart ${empty?'empty':''} ${isGodMode?'god':''}" style="${isGodMode && !empty ? style : ''}">❤</span>`;
-    }
-    document.querySelectorAll('.slot').forEach((s, i) => s.classList.toggle('active', i === player.selectedSlot));
-}
+    <header>
+      <div class="container">
+        <a id="a-title" href="/">
+          <h1>GamzeeChert</h1>
+        </a>
+        <h2>📜 Telegram Rules | 🎮 Game Rules | 📚 Game Guide | 🛍️ Madness Games Store | 🤖 Bot Info | 💎 Fragment</h2>
 
-window.onkeydown = (e) => {
-    if (document.activeElement.tagName === 'INPUT') return;
-    keys[e.code] = true; let k = e.key.toLowerCase();
-    if (k === 'g' || k === 'п') spawnClone();
-    if (k === 'n' || k === 'т') isNoclip = !isNoclip;
-    if (k === 'b' || k === 'и') { isGodMode = !isGodMode; updateUI(); }
-    if (k >= '1' && k <= '6') { player.selectedSlot = parseInt(k)-1; updateUI(); }
-};
-window.onkeyup = (e) => keys[e.code] = false;
+       <!-- <section id="downloads">
+          
+        </section> -->
+      </div>
+    </header>
 
-document.getElementById('side-input').onkeydown = (e) => { if (e.key === 'Enter') { if (e.target.value.toLowerCase().trim() === 'admin') { isAdmin = true; isGodMode = true; document.getElementById('slot5').style.display = 'flex'; updateUI(); } e.target.value = ""; e.target.blur(); } };
+    <div class="container">
+      <section id="main_content">
+        <link rel="stylesheet" type="text/css" href="css/style.css">
 
-canvas.onmousedown = (e) => {
-    if (!isGameStarted) return;
-    let mx = (e.clientX-canvas.width/2)/cameraZoom+player.x, my = (e.clientY-canvas.height/2)/cameraZoom+player.y, tx = Math.floor(mx/TILE), ty = Math.floor(my/TILE), k = `${tx},${ty}`;
-    if (e.button === 0 && world[k] && world[k].type !== 'bedrock') { spawnParticles(tx*TILE, ty*TILE, getDepthColor(ty*TILE)); delete world[k]; let mods = JSON.parse(localStorage.getItem('void_echo_v1_'+currentSeed)||'{}'); mods[k]="deleted"; localStorage.setItem('void_echo_v1_'+currentSeed,JSON.stringify(mods)); }
-    else if (e.button === 2 && ITEMS[player.selectedSlot]) { world[k] = { type: ITEMS[player.selectedSlot], modified: true, dist: 0 }; let mods = JSON.parse(localStorage.getItem('void_echo_v1_'+currentSeed)||'{}'); mods[k]=ITEMS[player.selectedSlot]; localStorage.setItem('void_echo_v1_'+currentSeed,JSON.stringify(mods)); }
-};
-canvas.oncontextmenu = (e) => e.preventDefault();
+<h1 id="-правила-для-чатов-telegram">📃 Правила для чатов Telegram</h1>
 
-document.getElementById('start-btn').onclick = () => {
-    currentSeed = document.getElementById('seed-input').value || Math.random().toString(36).substring(7);
-    document.getElementById('seed-display-val').value = currentSeed; document.getElementById('seed-container').style.display = "block"; document.getElementById('side-panel').style.display = "block"; document.getElementById('menu').style.display = 'none'; document.getElementById('hud').style.display = 'flex';
-    isGameStarted = true; generateRegion(-100, 100); player.y = 0; updateUI(); gameLoop();
-};
+<p><a href="./index.html" class="button-link">🌐 Главная страница</a>
+<a href="./links.html" class="button-link">🔗 Раздел ссылок</a></p>
 
-['m-left', 'm-right', 'm-jump'].forEach(id => { const el = document.getElementById(id); el.ontouchstart = (e) => { e.preventDefault(); keys[id] = true; }; el.ontouchend = (e) => { e.preventDefault(); keys[id] = false; }; });
+<hr>
 
-function initMenu() {
-    menuCanvas.width = innerWidth; menuCanvas.height = innerHeight;
-    let p = []; for(let i=0; i<50; i++) p.push({x: Math.random()*innerWidth, y: Math.random()*innerHeight, s: 1+Math.random()});
-    (function anim(){ if(isGameStarted) return; mCtx.fillStyle = 'black'; mCtx.fillRect(0,0,innerWidth,innerHeight); p.forEach(i => { i.y += i.s; if(i.y > innerHeight) i.y = -10; mCtx.fillStyle = '#333'; mCtx.fillRect(i.x, i.y, 4, 4); }); requestAnimationFrame(anim); })();
-}
-</script>
-</body>
-</html>```
+<h3 id="--временные-правила">⏳ • Временные правила:</h3>
+<p>Запрещены <strong>политические дискуссии, агитация и провокационные темы</strong>, не относящиеся к проекту;</p>
+
+<!-- За использование **нецензурной лексики** в чатах, а также **попытку обхода фильтра запрещённых слов** будет выдаваться **предупреждение**. -->
+
+<p>За <strong>чрезмерное использование нецензурной лексики</strong> будет выдаваться <strong>предупреждение</strong>.</p>
+
+<h3 id="--запрещено">🚫 • Запрещено:</h3>
+<ol>
+  <li>Спам;</li>
+  <li><a href="https://ru.m.wikipedia.org/wiki/ASCII-%D0%B3%D1%80%D0%B0%D1%84%D0%B8%D0%BA%D0%B0">ASCII графика</a>;</li>
+  <li><a href="https://ru.wikipedia.org/wiki/%D0%A4%D0%BB%D1%83%D0%B4#:~:text=%D0%92%20%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%D0%BC%20%D1%81%D0%BB%D1%83%D1%87%D0%B0%D0%B5,%D0%B8%20%D0%B1%D0%BB%D0%BE%D0%B3%D0%B0%D1%85">Флуд</a>;</li>
+  <li>Отправка <strong>материалов</strong> с тегом 18+ (Шок-контент);</li>
+  <li>Отправка <strong>стикеров</strong> с тегом 18+;</li>
+  <li>Отправка сообщений/материалов <strong>от имени канала</strong> (Разрешено только от личного аккаунта);</li>
+  <li>🆕 Содержание <strong>в профиле аккаунта</strong> неподобающего контента;</li>
+  <li>Прямые или косвенные <strong>оскорбления</strong> других участников;</li>
+  <li><strong>Дискриминация</strong> по национальному, религиозному или иному признаку;</li>
+  <li>Угрозы;</li>
+  <li>Действия, направленные на <strong>провокацию конфликтов, травлю или преследование участников</strong>;</li>
+  <li><strong>Пропаганда</strong> насилия, оружия, наркотических средств, алкоголя, табачных изделий;</li>
+  <li>Распространение сообщений/материалов, разглашающие <strong>любую информацию</strong> участника/модератора/администратора <strong>без его согласия</strong>;</li>
+  <li><strong>Размещение рекламы</strong> сторонних проектов/ресурсов/файлов <strong>без разрешения администрации</strong>;</li>
+  <li><strong>Распространение программ</strong> с уязвимостями/вирусами;</li>
+  <li><strong>Продажа</strong> игровых аккаунтов/карт;</li>
+  <li>Распространение <strong>ложной информации</strong>;</li>
+  <li>Попрошайничество;</li>
+  <li>Выдавать себя за <strong>модерацию/администрацию</strong> проектов;</li>
+  <li><strong>Критика</strong> действий модерации/администрации;</li>
+  <li><strong>Неадекватная критика</strong>. Даже если вам не нравится какой-то контент в игре, <strong>не стоит оскорблять чужой труд</strong>;</li>
+  <li><strong>Использование дополнительных аккаунтов</strong> для обхода ограничений/блокировки;</li>
+  <li>Использование команд /report и @admin <strong>без  весомой причины</strong>.</li>
+</ol>
+
+<h3 id="️--не-рекомендуется">⚠️ • Не рекомендуется:</h3>
+<ol>
+  <li>Злоупотребление <a href="https://ru.wikipedia.org/wiki/Caps_Lock#:~:text=%D0%A2%D0%95%D0%9A%D0%A1%D0%A2%2C%20%D0%9D%D0%90%D0%91%D0%A0%D0%90%D0%9D%D0%9D%D0%AB%D0%99%20%D0%A1%D0%9E%20%D0%92%D0%9A%D0%9B%D0%AE%D0%A7%D0%81%D0%9D%D0%9D%D0%AB%D0%9C%20%D0%A0%D0%95%D0%96%D0%98%D0%9C%D0%9E%D0%9C%20CAPS%20LOCK">Caps Lock</a>;</li>
+  <li>Злоупотребление смайлами;</li>
+  <li>Злоупотребление реакциями под сообщениями;</li>
+  <li><strong>Игнорирование предупреждений</strong> от модерации/администрации.</li>
+</ol>
+
+<h3 id="ℹ️--прочая-информация">ℹ️ • Прочая информация:</h3>
+<ul>
+  <li>Незнание правил <strong>не освобождает</strong> от ответственности.</li>
+  <li><strong>С 00:00 до 09:00</strong> (МСК) действует ограничение на отправку медиа во всех чатах.</li>
+  <li>Если Вас не устраивает поведение какого-либо участника, Вы можете написать <strong>жалобу</strong> о нём, использовав команду /report или @admin.
+    <blockquote>
+      <p>Чтобы отправить жалобу, необходимы эти условия:</p>
+      <ul>
+        <li>Команда доступна только в ответ на сообщение с нарушением;</li>
+        <li>Сообщение должно содержать указание причины нарушения.</li>
+      </ul>
+    </blockquote>
+  </li>
+</ul>
+
+<hr>
+
+<p><a href="./TGmodRules.html" class="button2-link">📝 Раздел для модераторов и стажёров</a></p>
+
+<p><code class="language-plaintext highlighter-rouge">Правила обновлены 30.11.2025</code></p>
+
+      </section>
+    </div>
+  
+</body></html>
